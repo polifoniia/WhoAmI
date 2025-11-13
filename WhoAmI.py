@@ -1,37 +1,58 @@
 import tkinter as tk
 from tkinter import messagebox, font
-import random, math, time
 import os
-import sys
 
-# === ФУНКЦИЯ ДЛЯ ВЫБОРА ШРИФТА ===
 def setup_font():
-    """Выбирает лучший доступный шрифт из предустановленных"""
-    # Получаем список доступных шрифтов в системе
     available_fonts = font.families()
     
-    # Список предпочтительных шрифтов в порядке приоритета
     preferred_fonts = [
-        "Comic Sans MS",      # Детский стиль, есть в Windows
-        "Arial Rounded MT Bold", # Закругленный, дружелюбный
-        "Segoe UI",           # Современный, есть в Windows 10/11
-        "Helvetica",          # Есть на Mac
-        "DejaVu Sans",        # Есть на Linux
-        "Tahoma",             # Универсальный
-        "Arial"               # Есть везде
+        "Comic Sans MS",
+        "Arial Rounded MT Bold", 
+        "Segoe UI",
+        "Helvetica",
+        "DejaVu Sans",
+        "Tahoma",
+        "Arial"
     ]
     
-    # Ищем первый доступный шрифт из списка предпочтений
     for font_name in preferred_fonts:
         if font_name in available_fonts:
-            print(f"Используется шрифт: {font_name}")
             return font.Font(family=font_name, size=12)
     
-    # Если ничего не нашли, используем стандартный
-    print("Используется стандартный шрифт")
     return font.Font(family="Arial", size=12)
 
-# === НАСТРОЙКИ ===
+def set_icon():
+    try:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        
+        
+        icon_variants = [
+            'icon.ico',
+            'icon.png',
+            'Icon.ico',
+            'ICON.ICO',
+            'favicon.ico'
+        ]
+        
+        for icon_file in icon_variants:
+            icon_path = os.path.join(base_path, icon_file)
+            if os.path.exists(icon_path):
+                if icon_file.lower().endswith('.ico'):
+                    window.iconbitmap(icon_path)
+                    print(f"Иконка загружена: {icon_file}")
+                    return True
+                elif icon_file.lower().endswith('.png'):
+                    
+                    icon = tk.PhotoImage(file=icon_path)
+                    window.iconphoto(True, icon)
+                    print(f"Иконка PNG загружена: {icon_file}")
+                    return True
+        print("Файл иконки не найден. Проверьте наличие icon.ico в папке с программой")
+        return False
+    except Exception as e:
+        print(f"Ошибка загрузки иконки: {e}")
+        return False
+
 colors = {
     'primary': '#FF6B8B',
     'secondary': '#4ECDC4',
@@ -47,26 +68,25 @@ current_test = None
 current_question = 0
 scores = {"A": 0, "B": 0, "C": 0, "D": 0}
 selected_answer = ""
-answer_buttons = []  # Список для хранения кнопок ответов
+answer_buttons = []
 
-# === ОСНОВНОЕ ОКНО ===
 window = tk.Tk()
 window.title("Хто я?")
 window.geometry("900x700")
 window.configure(bg='white')
 window.resizable(False, False)
 
-# Загружаем шрифт для всего приложения
+
+set_icon()
+
 app_font = setup_font()
 
-# Центрируем окно
 screen_width = window.winfo_screenwidth()
 screen_height = window.winfo_screenheight()
 x = (screen_width // 2) - (900 // 2)
 y = (screen_height // 2) - (700 // 2)
 window.geometry(f'900x700+{x}+{y}')
 
-# === КАСТОМНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ===
 def show_custom_confirm():
     confirm_window = tk.Toplevel(window)
     confirm_window.title("Підтвердження виходу")
@@ -76,17 +96,14 @@ def show_custom_confirm():
     confirm_window.transient(window)
     confirm_window.grab_set()
     
-    # Центрируем окно подтверждения
     cw_x = window.winfo_x() + (window.winfo_width() // 2) - (400 // 2)
     cw_y = window.winfo_y() + (window.winfo_height() // 2) - (200 // 2)
     confirm_window.geometry(f'400x200+{cw_x}+{cw_y}')
     
-    # Создаем шрифты для окна подтверждения
     title_font = (app_font.actual("family"), 16, "bold")
     text_font = (app_font.actual("family"), 12)
     button_font = (app_font.actual("family"), 11, "bold")
     
-    # Содержимое окна подтверждения
     tk.Label(confirm_window, text="Вихід з програми", 
              font=title_font,
              bg='white', fg=colors['primary']).pack(pady=15)
@@ -112,7 +129,6 @@ def show_custom_confirm():
               bg=colors['secondary'], fg='white',
               width=12, command=confirm_window.destroy).pack(side=tk.LEFT, padx=10)
 
-# === ФУНКЦИИ ===
 def clear_window():
     for w in window.winfo_children():
         w.destroy()
@@ -125,7 +141,6 @@ def create_main_menu():
     frame = tk.Frame(window, bg='white')
     frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-    # Создаем шрифты разных размеров на основе основного шрифта
     title_font = (app_font.actual("family"), 26, "bold")
     subtitle_font = (app_font.actual("family"), 16)
     button_font = (app_font.actual("family"), 14, "bold")
@@ -236,11 +251,9 @@ def get_questions():
         ]
 
 def update_button_styles():
-    """Обновляет стили всех кнопок ответов в зависимости от выбора"""
     for i, btn in enumerate(answer_buttons):
-        option_letter = btn["text"][0]  # Первый символ текста (A, B, C, D)
+        option_letter = btn["text"][0]
         if option_letter == selected_answer:
-            # Выделяем выбранную кнопку
             btn.config(font=(app_font.actual("family"), 12, "bold"),
                       bg=colors['accent2'],
                       fg='black',
@@ -249,7 +262,6 @@ def update_button_styles():
                       padx=10,
                       pady=8)
         else:
-            # Обычный стиль для невыбранных кнопок
             original_colors = [colors['primary'], colors['secondary'], colors['accent1'], colors['accent4']]
             btn.config(font=(app_font.actual("family"), 11, "bold"),
                       bg=original_colors[i],
@@ -268,7 +280,6 @@ def show_question():
     frame = tk.Frame(window, bg='white')
     frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-    # Создаем шрифты для страницы вопроса
     question_num_font = (app_font.actual("family"), 14, "bold")
     question_text_font = (app_font.actual("family"), 16, "bold")
     option_font = (app_font.actual("family"), 11, "bold")
@@ -284,7 +295,7 @@ def show_question():
              bg='white', fg='#333', wraplength=600, justify='center').pack(pady=20)
 
     selected_answer = ""
-    answer_buttons = []  # Очищаем список кнопок
+    answer_buttons = []
 
     color_list = [colors['primary'], colors['secondary'], colors['accent1'], colors['accent4']]
     for i, opt in enumerate(q["options"]):
@@ -297,7 +308,7 @@ def show_question():
                         pady=5,
                         command=lambda o=opt[0]: select_answer(o))
         btn.pack(fill='x', padx=100, pady=8)
-        answer_buttons.append(btn)  # Добавляем кнопку в список
+        answer_buttons.append(btn)
 
     next_button = tk.Button(frame, text="ДАЛІ",
                             font=button_font,
@@ -313,7 +324,7 @@ def select_answer(a):
     global selected_answer
     selected_answer = a
     next_button.config(state='normal', bg=colors['success'])
-    update_button_styles()  # Обновляем стили кнопок
+    update_button_styles()
 
 def next_question():
     global current_question, scores
@@ -385,7 +396,6 @@ def show_result():
     frame = tk.Frame(window, bg='white')
     frame.pack(expand=True, fill='both', padx=20, pady=20)
 
-    # Создаем шрифты для страницы результатов
     title_font = (app_font.actual("family"), 22, "bold")
     text_font = (app_font.actual("family"), 12)
     button_font = (app_font.actual("family"), 12, "bold")
@@ -406,6 +416,5 @@ def show_result():
     tk.Button(frame, text="Вийти", bg=colors['danger'], fg='white',
               font=button_font, command=exit_app).pack(fill='x', padx=100, pady=10)
 
-# === СТАРТ ПРОГРАМИ ===
 create_main_menu()
 window.mainloop()
