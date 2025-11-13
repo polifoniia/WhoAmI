@@ -30,13 +30,13 @@ def set_icon(window):
         icon_path = os.path.join(base_path, icon_file)
         if os.path.exists(icon_path):
             window.iconbitmap(icon_path)
-            print(f"Иконка загружена: {icon_file}")
+            # print(f"Иконка загружена: {icon_file}")
             return True
-        print("Файл иконки не найден. Проверьте наличие icon.ico в папке с программой")
+        print("Іконки файлу не знайдено. Перевірте наявність icon.ico в папці з програмою")
         return False
     
     except Exception as e:
-        print(f"Ошибка загрузки иконки: {e}")
+        print(f"Ошибка завантаження іконок: {e}")
         return False
 
 colors = {
@@ -61,7 +61,6 @@ window.title("Хто я?")
 window.geometry("900x700")
 window.configure(bg='white')
 window.resizable(False, False)
-
 
 set_icon(window)
 
