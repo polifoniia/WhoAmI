@@ -21,34 +21,20 @@ def setup_font():
     
     return font.Font(family="Arial", size=12)
 
-def set_icon():
+def set_icon(window):
     try:
         base_path = os.path.dirname(os.path.abspath(__file__))
-        
-        
-        icon_variants = [
-            'icon.ico',
-            'icon.png',
-            'Icon.ico',
-            'ICON.ICO',
-            'favicon.ico'
-        ]
-        
-        for icon_file in icon_variants:
-            icon_path = os.path.join(base_path, icon_file)
-            if os.path.exists(icon_path):
-                if icon_file.lower().endswith('.ico'):
-                    window.iconbitmap(icon_path)
-                    print(f"Иконка загружена: {icon_file}")
-                    return True
-                elif icon_file.lower().endswith('.png'):
-                    
-                    icon = tk.PhotoImage(file=icon_path)
-                    window.iconphoto(True, icon)
-                    print(f"Иконка PNG загружена: {icon_file}")
-                    return True
+      
+        icon_file = 'icon.ico'
+
+        icon_path = os.path.join(base_path, icon_file)
+        if os.path.exists(icon_path):
+            window.iconbitmap(icon_path)
+            print(f"Иконка загружена: {icon_file}")
+            return True
         print("Файл иконки не найден. Проверьте наличие icon.ico в папке с программой")
         return False
+    
     except Exception as e:
         print(f"Ошибка загрузки иконки: {e}")
         return False
@@ -77,7 +63,7 @@ window.configure(bg='white')
 window.resizable(False, False)
 
 
-set_icon()
+set_icon(window)
 
 app_font = setup_font()
 
@@ -93,6 +79,9 @@ def show_custom_confirm():
     confirm_window.geometry("400x200")
     confirm_window.configure(bg='white')
     confirm_window.resizable(False, False)
+    
+    set_icon(confirm_window)
+    
     confirm_window.transient(window)
     confirm_window.grab_set()
     
